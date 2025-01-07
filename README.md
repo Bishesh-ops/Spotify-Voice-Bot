@@ -50,4 +50,4 @@ Here are some voice commands the bot supports:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/spotify-voice-control-bot.git
+   https://github.com/Bishesh-ops/Spotify-Voice-Bot.git
