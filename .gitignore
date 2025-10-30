@@ -1,4 +1,7 @@
 .cache
 /spotify_bot/__init__.py
 /spotify_bot/__pycache__
-/spotify_bot/.env
+.env
+.env.*
+.cache*
+*.log
