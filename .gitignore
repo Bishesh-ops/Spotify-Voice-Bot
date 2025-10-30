@@ -1,17 +1,11 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
 *.egg-info/
-.installed.cfg
-*.egg
 
 # Virtual Environments
 venv/
 .venv/
-env/
-ENV/
 
 # Sensitive Files
 .env
