@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 from tests.conftest import command_handler, mock_spotify_service
 
 # Import the service and exceptions
-from spotify_service import PlaybackError, SearchError
+from spotify_bot.spotify_service import PlaybackError, SearchError
 
 # --- Re-use mock results from service tests ---
 from tests.test_spotify_service import (
@@ -121,8 +121,14 @@ def test_add_to_playlist_command(command_handler: MagicMock, mock_spotify_servic
     
     assert success is True
     assert "Added 'Test Song' to playlist 'My Favs'" in message
+    
+    # Test that the search query was lowercased
     mock_spotify_service.search.assert_called_once_with("test song", search_type='track')
-    mock_spotify_service.add_to_playlist.assert_called_once_with("my favs", ["spotify:track:123"])
+    
+    # --- THE FIX ---
+    # Test that the playlist name was passed with its ORIGINAL case
+    # The service layer is responsible for handling case-insensitivity
+    mock_spotify_service.add_to_playlist.assert_called_once_with("My Favs", ["spotify:track:123"])
 
 def test_unrecognized_command(command_handler: MagicMock):
     """Test a command that doesn't match any keyword."""

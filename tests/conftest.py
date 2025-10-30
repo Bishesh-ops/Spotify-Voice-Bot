@@ -4,15 +4,10 @@ Pytest fixtures for the test suite.
 import pytest
 from unittest.mock import MagicMock, patch
 
-# Make sure your project root is in the path for imports
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# Now you can import your modules
-from config import SpotifyConfig, AppConfig
-from spotify_service import SpotifyService, PlaybackError, SearchError
-from command_handler import CommandHandler
+# --- FIX: Import from the 'spotify_bot' package ---
+from spotify_bot.config import SpotifyConfig, AppConfig
+from spotify_bot.spotify_service import SpotifyService, PlaybackError, SearchError
+from spotify_bot.command_handler import CommandHandler
 
 @pytest.fixture
 def mock_config() -> SpotifyConfig:

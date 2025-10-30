@@ -4,12 +4,14 @@ Unit tests for the SpotifyService class.
 import pytest
 from unittest.mock import MagicMock, patch
 from spotipy.exceptions import SpotifyException
+from typing import Tuple, Generator
 
 # Import from conftest
 from tests.conftest import mock_config
 
-# Import the service and exceptions
-from spotify_service import SpotifyService, PlaybackError, SearchError, AuthenticationError
+# --- FIX: Import from the 'spotify_bot' package ---
+from spotify_bot.spotify_service import SpotifyService, PlaybackError, SearchError, AuthenticationError
+from spotify_bot.config import SpotifyConfig  
 
 # --- Mocks for spotipy results ---
 MOCK_TRACK_SEARCH = {
@@ -43,14 +45,14 @@ MOCK_CURRENT_USER = {'display_name': 'TestUser', 'id': 'test_user_id'}
 
 
 @pytest.fixture
-def service_with_mocks(mock_config: SpotifyConfig) -> Tuple[SpotifyService, MagicMock]:
+def service_with_mocks(mock_config: SpotifyConfig) -> Generator[Tuple[SpotifyService, MagicMock], None, None]:
     """
     Provides a SpotifyService instance where spotipy is mocked.
     This tests the *logic* inside SpotifyService.
     """
-    # Patch the two classes that SpotifyService tries to initialize
-    with patch('spotify_service.SpotifyOAuth', autospec=True) as mock_oauth:
-        with patch('spotify_service.Spotify', autospec=True) as mock_spotify_constructor:
+    # --- FIX: Update patch target to the new package path ---
+    with patch('spotify_bot.spotify_service.SpotifyOAuth', autospec=True) as mock_oauth:
+        with patch('spotify_bot.spotify_service.Spotify', autospec=True) as mock_spotify_constructor:
             # Create a mock instance for the client
             mock_sp_client = MagicMock()
             

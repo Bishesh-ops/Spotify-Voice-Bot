@@ -7,7 +7,8 @@ from typing import Optional, List, Dict, Tuple, Any
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
-from config import SpotifyConfig  # Import from your new config file
+# --- FIX: Add a dot for relative import ---
+from .config import SpotifyConfig
 
 logger = logging.getLogger(__name__)
 
