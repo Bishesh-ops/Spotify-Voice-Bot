@@ -67,11 +67,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-    - name: Install PortAudio (Linux only)
-      if: startsWith(matrix.os, 'ubuntu')
+    # ✅ Install system dependencies BEFORE pip installs anything
+    - name: Install audio dependencies (Linux only)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-dev
+        sudo apt-get install -y portaudio19-dev python3-dev libasound-dev
 
     - name: Install dependencies
       run: |
