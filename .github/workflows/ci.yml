@@ -10,22 +10,30 @@ jobs:
   lint-and-format:
     name: Lint & Format Check
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Check out code
       uses: actions/checkout@v4
 
     - name: Set up Python 3.13
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: "3.13" # Using 3.13 for linting
+        python-version: "3.13"
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
-    - name: Run Linters (as per your requirements.txt)
+
+    - name: Run Linters
       run: |
         pylint $(git ls-files 'spotify_bot/*.py')
         black --check .
@@ -35,30 +43,35 @@ jobs:
     name: Run Unit Tests
     needs: lint-and-format
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        # Updated to use modern Python versions, including 3.13
-        python-version: ["3.10", "3.11", "3.12", "3.13"] 
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - name: Check out code
       uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
-    # --- THIS IS THE FIX ---
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Install PortAudio (Linux only)
-      if: matrix.os == 'ubuntu-latest'
+      if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo apt-get update
-        sudo apt-get install -y portaudio19-dev
-      # Your own quick_start.md mentions this requirement for Linux
+        sudo apt-get install -y portaudio19-dev python3-dev
 
     - name: Install dependencies
       run: |
