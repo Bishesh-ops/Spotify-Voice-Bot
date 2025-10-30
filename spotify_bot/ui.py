@@ -9,14 +9,13 @@ import threading
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 
-# Import new v2.0 modules
-from logger_setup import setup_logging
-from config import AppConfig
-from spotify_service import SpotifyService, AuthenticationError, PlaybackError
-from command_handler import CommandHandler
-from voice_handler import VoiceHandler
-from feedback_handler import FeedbackHandler
-
+# --- FIX: Add dots for all relative imports ---
+from .logger_setup import setup_logging
+from .config import AppConfig
+from .spotify_service import SpotifyService, AuthenticationError
+from .command_handler import CommandHandler
+from .voice_handler import VoiceHandler
+from .feedback_handler import FeedbackHandler
 # --- Custom UI Log Handler ---
 class QueueLogHandler(logging.Handler):
     """Sends log records to a queue for the UI."""

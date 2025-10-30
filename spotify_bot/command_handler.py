@@ -5,7 +5,7 @@ Maps text commands to specific service actions.
 import logging
 import re
 from typing import Dict, Tuple
-from spotify_service import SpotifyService, PlaybackError, SearchError
+from .spotify_service import SpotifyService, PlaybackError, SearchError
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +21,14 @@ class Command:
 class PlayCommand(Command):
     """Handle 'play' commands (track, artist, playlist)."""
     def execute(self, command_text: str) -> Tuple[bool, str]:
-        text = command_text.lower().replace("play", "").strip()
+        text = command_text.lower().replace("play", "", 1).strip() # Use replace with 1
         if not text:
             return False, "Please specify what to play."
         
         try:
             if text.startswith("playlist"):
-                playlist_name = text.replace("playlist", "").strip()
+                # --- FIX 1: Use replace with count 1 ---
+                playlist_name = text.replace("playlist", "", 1).strip()
                 playlist = self.service.get_playlist_by_name(playlist_name)
                 if playlist:
                     self.service.play_context(playlist['uri'])
@@ -35,7 +36,8 @@ class PlayCommand(Command):
                 return False, f"Playlist '{playlist_name}' not found"
             
             elif text.startswith("artist"):
-                artist_name = text.replace("artist", "").strip()
+                # --- FIX 2: Use replace with count 1 ---
+                artist_name = text.replace("artist", "", 1).strip()
                 results = self.service.search(artist_name, search_type='artist')
                 artist = results[0]
                 self.service.play_context(artist['uri'])
@@ -127,20 +129,27 @@ class CreatePlaylistCommand(Command):
 
 class AddToPlaylistCommand(Command):
     def execute(self, command_text: str) -> Tuple[bool, str]:
-        text = command_text.lower().replace('add', '', 1).strip()
+        # Use regex to capture original casing
+        match = re.search(r"add (.+?) to playlist (.+)", command_text, flags=re.I)
         
-        match = re.search(r"(.+?) to playlist (.+)", text)
         if not match:
             return False, "Format: 'add [song] to playlist [name]'"
         
-        song_name, playlist_name = match.group(1).strip(), match.group(2).strip()
+        song_name = match.group(1).strip()
+        playlist_name = match.group(2).strip()
         
         try:
-            results = self.service.search(song_name, search_type='track')
+            # --- THE FIX ---
+            # Search using the lowercase version of the song name
+            results = self.service.search(song_name.lower(), search_type='track')
             track = results[0]
+            
+            # Add to playlist using the original cased playlist_name
+            # (our service handles its own lowercasing)
             success = self.service.add_to_playlist(playlist_name, [track['uri']])
             
             if success:
+                # Use the original cased playlist_name for the message
                 return True, f"Added '{track['name']}' to playlist '{playlist_name}'"
             return False, f"Failed to add track (playlist '{playlist_name}' not found?)"
         except (SearchError, PlaybackError) as e:
@@ -175,6 +184,7 @@ class CommandHandler:
         for keyword, command in self.commands.items():
             if command_lower.startswith(keyword):
                 try:
+                    # Pass the original cased text to the command
                     return command.execute(command_text)
                 except Exception as e:
                     logger.error(f"Command execution error: {e}")
