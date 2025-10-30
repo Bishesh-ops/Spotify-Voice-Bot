@@ -216,22 +216,26 @@ class SpotifyBotUI(tk.Tk):
         else:
             self.status_label.config(bg=self.ui_config.primary_color)
 
-    def log_to_ui(self, message: str):
+    def log_to_ui(self, message_record: logging.LogRecord): # <-- FIX 1
         """Append a message to the text log area."""
         self.log_text.config(state="normal")
         
+        # --- FIX 2: Check the attributes of the LogRecord object ---
+        log_level = message_record.levelname
+        log_message = message_record.getMessage()
+
         # Determine tag
-        if "ERROR" in message:
+        if log_level == "ERROR":
             tag = "ERROR"
-        elif "WARN" in message:
+        elif log_level == "WARNING":
             tag = "WARN"
-        elif "✓" in message:
+        elif "✓" in log_message: # You can still check the message string
             tag = "SUCCESS"
         else:
             tag = "INFO"
             
         # Format message
-        formatted_message = message.replace("✓ ", "") + "\n"
+        formatted_message = log_message.replace("✓ ", "") + "\n"
         
         self.log_text.insert(tk.END, formatted_message, tag)
         self.log_text.see(tk.END)
@@ -245,7 +249,7 @@ class SpotifyBotUI(tk.Tk):
             except queue.Empty:
                 break
             else:
-                self.log_to_ui(record)
+                self.log_to_ui(record) # 'record' is a LogRecord object
         self.after(100, self.poll_log_queue)
 
     def on_closing(self):
