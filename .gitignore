@@ -1,7 +1,31 @@
-.cache
-/spotify_bot/__init__.py
-/spotify_bot/__pycache__
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Sensitive Files
 .env
 .env.*
-.cache*
 *.log
+
+# Spotify Cache
+.cache
+.cache-*
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
