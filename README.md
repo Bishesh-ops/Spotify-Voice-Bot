@@ -106,11 +106,3 @@ Follow the [Quick Start Guide](quick_start.md) to get up and running in 5 minute
     -   **Fix 2:** Try calibrating by running the app in a quiet room first.
 
 ---
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read the [contributing.md](contributing.md) guide to get started.
-
--   **Code Style:** `black`, `pylint`, and `mypy` are used.
--   **Testing:** `pytest` is used for unit tests. Please add tests for new features.
--   **Architecture:** Follow the established Service Layer and Command Patterns.
