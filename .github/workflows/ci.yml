@@ -10,29 +10,21 @@ jobs:
   lint-and-format:
     name: Lint & Format Check
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Check out code
       uses: actions/checkout@v4
 
     - name: Set up Python 3.13
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: "3.13"
-
-    - name: Cache pip dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
+        
     - name: Run Linters
       run: |
         pylint $(git ls-files 'spotify_bot/*.py')
@@ -43,7 +35,7 @@ jobs:
     name: Run Unit Tests
     needs: lint-and-format
     runs-on: ${{ matrix.os }}
-
+    
     strategy:
       fail-fast: false
       matrix:
@@ -55,30 +47,24 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Cache pip dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    # ✅ Install system dependencies BEFORE pip installs anything
-    - name: Install audio dependencies (Linux only)
-      if: runner.os == 'Linux'
+    # --- Fix for PyAudio on Ubuntu ---
+    - name: Ensure PortAudio is installed (for PyAudio)
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
-        sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-dev libasound-dev
+        sudo apt-get update -y
+        sudo apt-get install -y --no-install-recommends \
+          portaudio19-dev libasound-dev alsa-utils python3-dev
+        echo "✅ PortAudio and dependencies installed successfully"
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Run Pytest
+    - name: Run Unit Tests
       run: |
         pytest --cov=. --cov-report=xml
