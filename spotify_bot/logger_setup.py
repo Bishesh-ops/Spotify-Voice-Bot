@@ -5,14 +5,14 @@ import logging
 import sys
 from logging.handlers import RotatingFileHandler
 from typing import Optional
-from queue import Queue
+from queue import Queue  # This import is correct
 
 def setup_logging(
     log_level: str = "INFO",
     log_file: str = "spotify_bot.log",
     max_bytes: int = 1024 * 1024,  # 1 MB
     backup_count: int = 5,
-    ui_log_queue: Optional[logging.Queue] = None
+    ui_log_queue: Optional[Queue] = None  # <--- FIX: Use Queue, not logging.Queue
 ):
     """
     Configures the root logger for the application.
@@ -22,7 +22,7 @@ def setup_logging(
         log_file (str): The name of the file to log to.
         max_bytes (int): Max size of the log file before rotating.
         backup_count (int): Number of old log files to keep.
-        ui_log_queue (Optional[logging.Queue]): A queue to send logs to the UI.
+        ui_log_queue (Optional[Queue]): A queue to send logs to the UI. <-- FIX
     """
     level = logging.getLevelName(log_level.upper())
     
