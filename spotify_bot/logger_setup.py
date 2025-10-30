@@ -5,6 +5,7 @@ import logging
 import sys
 from logging.handlers import RotatingFileHandler
 from typing import Optional
+from queue import Queue
 
 def setup_logging(
     log_level: str = "INFO",
